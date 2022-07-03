@@ -57,5 +57,12 @@ export const useBookStore = defineStore("bookStore", {
       });
       await fetch(`${URL}/books/return/${isbn}`);
     },
+    async removeBook(isbn) {
+      console.log(isbn);
+      const book = this.books.find((o) => o.isbn === isbn);
+      const bookIndex = this.books.indexOf(book);
+      this.books.splice(bookIndex, 1);
+      await fetch(`${URL}/books/remove/${isbn}`);
+    },
   },
 });

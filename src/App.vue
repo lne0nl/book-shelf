@@ -45,6 +45,11 @@ const returnBook = async (isbn) => {
   document.getElementById(isbn).classList.remove("active");
   await store.returnBook(isbn);
 };
+
+const removeBook = async (isbn) => {
+  document.getElementById(isbn).classList.remove("active");
+  await store.removeBook(isbn);
+};
 </script>
 
 <template>
@@ -91,7 +96,9 @@ const returnBook = async (isbn) => {
                 Retour du livre
               </li>
               <li class="book-option">Ajouter à une collection</li>
-              <li class="book-option">Supprimer le livre</li>
+              <li class="book-option" @click="removeBook(book.isbn)">
+                Supprimer le livre
+              </li>
             </ul>
           </div>
           <div class="title">{{ book.title }}</div>

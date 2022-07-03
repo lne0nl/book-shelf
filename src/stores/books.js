@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-const URL = "https://neon-books.herokuapp.com";
+const URL = import.meta.env.VITE_URL;
 
 export const useBookStore = defineStore("bookStore", {
   state: () => ({

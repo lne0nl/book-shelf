@@ -58,11 +58,23 @@ export const useBookStore = defineStore("bookStore", {
       await fetch(`${URL}/books/return/${isbn}`);
     },
     async removeBook(isbn) {
-      console.log(isbn);
       const book = this.books.find((o) => o.isbn === isbn);
       const bookIndex = this.books.indexOf(book);
       this.books.splice(bookIndex, 1);
       await fetch(`${URL}/books/remove/${isbn}`);
+    },
+    async setType(isbn, type) {
+      const book = this.books.find((o) => o.isbn === isbn);
+      const bookIndex = this.books.indexOf(book);
+      this.books[bookIndex].type = type;
+
+      await fetch(`${URL}/books/type`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ isbn, type })
+      });
     },
   },
 });

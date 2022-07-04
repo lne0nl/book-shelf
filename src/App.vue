@@ -50,6 +50,8 @@ const removeBook = async (isbn) => {
   document.getElementById(isbn).classList.remove("active");
   await store.removeBook(isbn);
 };
+
+const setType = async (isbn, type) => await store.setType(isbn, type)
 </script>
 
 <template>
@@ -110,6 +112,14 @@ const removeBook = async (isbn) => {
             {{ book.publishedDate }}
           </div>
           <div v-if="book.borrower">Prêté à {{ book.borrower }}</div>
+          <div class="book-type">
+            <button :class="book.type === 'book' ? 'active' : ''" type="button" @click="setType(book.isbn, 'book')">
+              Livre
+            </button>
+            <button :class="book.type === 'comic' ? 'active' : ''" type="button" @click="setType(book.isbn, 'comic')">
+              BD
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -276,6 +286,31 @@ img {
   border: none;
   font-size: inherit;
   cursor: pointer;
+}
+
+.book-type {
+  position: absolute;
+  display: flex;
+  bottom: 10px;
+  right: 10px;
+}
+
+.book-type button {
+  border: none;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.book-type button.active {
+  background-color: rgb(83, 139, 78);
+  color: white;
+}
+
+.book-type button:first-child {
+  margin-right: 10px;
 }
 
 .cover {

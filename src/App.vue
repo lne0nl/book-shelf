@@ -183,6 +183,7 @@ h1 {
   text-align: center;
   text-transform: uppercase;
   position: fixed;
+  z-index: 2;
   left: 0;
   right: 0;
   top: 0;
@@ -241,6 +242,7 @@ img {
 }
 
 .book.active .book-options {
+  z-index: 1;
   left: 10px;
   bottom: 10px;
   top: 10px;

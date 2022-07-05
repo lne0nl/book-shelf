@@ -75,6 +75,6 @@ export const useBookStore = defineStore("bookStore", {
         method: "POST",
         body: JSON.stringify({ isbn, type })
       });
-    },
+    }
   },
 });

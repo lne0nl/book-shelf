@@ -87,6 +87,7 @@ export const useBookStore = defineStore("bookStore", {
       }
       const data = await result.json();
       this.books = data;
+      this.numberOfBooks = this.books.length;
     },
   },
 });

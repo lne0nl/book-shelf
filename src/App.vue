@@ -62,7 +62,7 @@ const search = async () => {
 
 <template>
   <div class="length">
-    <div>Actuellement {{ numberOfBooks }} livres dans la bibliothèque</div>
+    <div><b>{{ numberOfBooks }}</b> livres</div>
     <div class="search">
       <input type="text" placeholder="Rechercher par auteur" v-model="searchQuery" @keyup="search" />
       <SearchIcon class="search-icon" />

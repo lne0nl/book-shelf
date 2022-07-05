@@ -75,6 +75,18 @@ export const useBookStore = defineStore("bookStore", {
         method: "POST",
         body: JSON.stringify({ isbn, type })
       });
-    }
+    },
+    async search(searchQuery) {
+      let result = [];
+
+      if (searchQuery.length > 0) {
+        searchQuery = `"${searchQuery}"`;
+        result = await fetch(`${URL}/books/search/author/${searchQuery}`);
+      } else {
+        result = await fetch(`${URL}/books`);
+      }
+      const data = await result.json();
+      this.books = data;
+    },
   },
 });

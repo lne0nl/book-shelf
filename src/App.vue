@@ -1,5 +1,6 @@
 <script setup>
 import BookSvg from "@/assets/read-book.svg";
+import SearchIcon from "@/assets/search.svg";
 import { useBookStore } from "@/stores/books";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -8,6 +9,7 @@ const { books, imagesVisible, images, numberOfBooks } = storeToRefs(store);
 store.getBooks();
 
 let input = ref("");
+let searchQuery = ref("");
 
 const togglePopin = () => {
   store.imagesVisible = !store.imagesVisible;
@@ -51,13 +53,21 @@ const removeBook = async (isbn) => {
   await store.removeBook(isbn);
 };
 
-const setType = async (isbn, type) => await store.setType(isbn, type)
+const setType = async (isbn, type) => await store.setType(isbn, type);
+
+const search = async () => {
+  store.search(searchQuery.value);
+};
 </script>
 
 <template>
-  <h5 class="length">
-    Actuellement {{ numberOfBooks }} livres dans la bibliothèque
-  </h5>
+  <div class="length">
+    <div>Actuellement {{ numberOfBooks }} livres dans la bibliothèque</div>
+    <div class="search">
+      <input type="text" placeholder="Rechercher par auteur" v-model="searchQuery" @keyup="search" />
+      <SearchIcon class="search-icon" />
+    </div>
+  </div>
   <div class="shelf">
     <div v-for="book in books" :key="book">
       <div class="book" :id="book.isbn">
@@ -72,7 +82,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type)
         <div class="info">
           <div class="book-options">
             <button
-              type="button" 
+              type="button"
               class="book-options-button"
               @click="openOptions"
               :data-book="book.isbn"
@@ -209,7 +219,24 @@ img {
 }
 
 .length {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
   margin-top: 70px;
+}
+
+.search {
+  display: flex;
+}
+
+.search input[type="text"] {
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.search-icon {
+  width: 25px;
+  margin-left: 10px;
 }
 
 .shelf {

@@ -7,7 +7,7 @@ import { ref } from "vue";
 const store = useBookStore();
 const { books, imagesVisible, images, numberOfBooks, activeFilter } =
   storeToRefs(store);
-store.getAll();
+store.getBooks();
 
 let input = ref("");
 let searchQuery = ref("");
@@ -71,7 +71,10 @@ const editField = async (e, isbn, initialValue) => {
   }
 };
 
-const filterBooks = async (e) => store.filterBooks(e.target.dataset.filter);
+const filterBooks = async (e) => {
+  searchQuery.value = "";
+  store.filterBooks(e.target.dataset.filter);
+}
 </script>
 
 <template>
@@ -191,15 +194,15 @@ const filterBooks = async (e) => store.filterBooks(e.target.dataset.filter);
   <h1>
     <div class="display-type">
       <div
-        :class="activeFilter === 'books' ? 'active' : ''"
-        data-filter="books"
+        :class="activeFilter === 'book' ? 'active' : ''"
+        data-filter="book"
         @click="filterBooks"
       >
         Livres
       </div>
       <div
-        :class="activeFilter === 'comics' ? 'active' : ''"
-        data-filter="comics"
+        :class="activeFilter === 'comic' ? 'active' : ''"
+        data-filter="comic"
         @click="filterBooks"
       >
         Bds
@@ -220,7 +223,7 @@ const filterBooks = async (e) => store.filterBooks(e.target.dataset.filter);
     <div class="search">
       <input
         type="text"
-        placeholder="Rechercher par auteur"
+        placeholder="Recherche..."
         v-model="searchQuery"
         @keyup="search"
       />

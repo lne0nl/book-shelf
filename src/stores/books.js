@@ -11,23 +11,10 @@ export const useBookStore = defineStore("bookStore", {
     activeFilter: "all",
   }),
   actions: {
-    async getAll() {
-      // this.books = [];
-      const result = await fetch(`${URL}/books`);
-      const data = await result.json();
-      this.books = data;
-      this.numberOfBooks = this.books.length;
-    },
-    async getComics() {
-      const result = await fetch(`${URL}/books/comics`);
-      const data = await result.json();
-      this.books = data;
-      this.numberOfBooks = this.books.length;
-    },
-    async getBooks() {
-      const result = await fetch(`${URL}/books/books`);
-      const data = await result.json();
-      this.books = data;
+    async getBooks(filter = "all") {
+      const response = await fetch(`${URL}/books/${filter}`);
+      const jsonResponse = await response.json();
+      this.books = jsonResponse;
       this.numberOfBooks = this.books.length;
     },
     async searchImages(code) {
@@ -91,12 +78,13 @@ export const useBookStore = defineStore("bookStore", {
     },
     async search(searchQuery) {
       let result = [];
+      this.activeFilter = "all";
 
       if (searchQuery.length > 0) {
         searchQuery = `"${searchQuery}"`;
-        result = await fetch(`${URL}/books/search/author/${searchQuery}`);
+        result = await fetch(`${URL}/books/search/${searchQuery}`);
       } else {
-        result = await fetch(`${URL}/books`);
+        result = await fetch(`${URL}/books/all`);
       }
       const data = await result.json();
       this.books = data;
@@ -117,18 +105,8 @@ export const useBookStore = defineStore("bookStore", {
     },
     async filterBooks(filter) {
       if (filter !== this.activeFilter) {
-        switch (filter) {
-          case "books":
-            this.getBooks();
-            break;
-          case "comics":
-            this.getComics();
-            break;
-          default:
-            this.getAll();
-            break;
-        }
         this.activeFilter = filter;
+        this.getBooks(filter);
       }
     },
   },

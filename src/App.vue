@@ -5,8 +5,9 @@ import { useBookStore } from "@/stores/books";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 const store = useBookStore();
-const { books, imagesVisible, images, numberOfBooks } = storeToRefs(store);
-store.getBooks();
+const { books, imagesVisible, images, numberOfBooks, activeFilter } =
+  storeToRefs(store);
+store.getAll();
 
 let input = ref("");
 let searchQuery = ref("");
@@ -68,22 +69,15 @@ const editField = async (e, isbn, initialValue) => {
 
     if (newValue !== initialValue) await store.editField(isbn, field, newValue);
   }
-}
+};
+
+const filterBooks = async (e) => store.filterBooks(e.target.dataset.filter);
 </script>
 
 <template>
   <div class="length">
     <div>
       <b>{{ numberOfBooks }}</b> livres
-    </div>
-    <div class="search">
-      <input
-        type="text"
-        placeholder="Rechercher par auteur"
-        v-model="searchQuery"
-        @keyup="search"
-      />
-      <SearchIcon class="search-icon" />
     </div>
   </div>
   <div class="shelf">
@@ -145,7 +139,6 @@ const editField = async (e, isbn, initialValue) => {
           </div>
           <div
             class="subtitle"
-            v-if="book.subtitle"
             contenteditable="true"
             name="subtitle"
             @keypress="editField($event, book.isbn, book.subtitle)"
@@ -196,8 +189,42 @@ const editField = async (e, isbn, initialValue) => {
     </div>
   </div>
   <h1>
+    <div class="display-type">
+      <div
+        :class="activeFilter === 'books' ? 'active' : ''"
+        data-filter="books"
+        @click="filterBooks"
+      >
+        Livres
+      </div>
+      <div
+        :class="activeFilter === 'comics' ? 'active' : ''"
+        data-filter="comics"
+        @click="filterBooks"
+      >
+        Bds
+      </div>
+      <div
+        :class="activeFilter === 'all' ? 'active' : ''"
+        data-filter="all"
+        @click="filterBooks"
+      >
+        Tout
+      </div>
+    </div>
+
     <div class="logo">
       <BookSvg />
+    </div>
+
+    <div class="search">
+      <input
+        type="text"
+        placeholder="Rechercher par auteur"
+        v-model="searchQuery"
+        @keyup="search"
+      />
+      <SearchIcon class="search-icon" />
     </div>
   </h1>
 </template>
@@ -240,9 +267,14 @@ const editField = async (e, isbn, initialValue) => {
 }
 
 h1 {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
   text-align: center;
   text-transform: uppercase;
   position: fixed;
+  font-size: inherit;
   z-index: 2;
   left: 0;
   right: 0;
@@ -253,11 +285,25 @@ h1 {
 }
 
 .logo {
-  display: flex;
-  align-items: center;
   width: 40px;
-  margin: auto;
   color: white;
+}
+
+.display-type {
+  display: flex;
+  color: white;
+}
+
+.display-type div {
+  cursor: pointer;
+}
+
+.display-type div.active {
+  color: red;
+}
+
+.display-type div:nth-child(2) {
+  margin: 0 10px;
 }
 
 h2 {
@@ -276,6 +322,7 @@ img {
 }
 
 .search {
+  color: white;
   display: flex;
 }
 

@@ -58,13 +58,31 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
 const search = async () => {
   store.search(searchQuery.value);
 };
+
+const editField = async (e, isbn, initialValue) => {
+  if (e.key === "Enter") {
+    e.target.blur();
+    e.preventDefault();
+    const field = e.target.getAttribute("name");
+    const newValue = e.target.innerText;
+
+    if (newValue !== initialValue) await store.editField(isbn, field, newValue);
+  }
+}
 </script>
 
 <template>
   <div class="length">
-    <div><b>{{ numberOfBooks }}</b> livres</div>
+    <div>
+      <b>{{ numberOfBooks }}</b> livres
+    </div>
     <div class="search">
-      <input type="text" placeholder="Rechercher par auteur" v-model="searchQuery" @keyup="search" />
+      <input
+        type="text"
+        placeholder="Rechercher par auteur"
+        v-model="searchQuery"
+        @keyup="search"
+      />
       <SearchIcon class="search-icon" />
     </div>
   </div>
@@ -104,7 +122,11 @@ const search = async () => {
                   <button type="submit">OK</button>
                 </form>
               </li>
-              <li v-if="book.borrower" class="book-option" @click="returnBook(book.isbn)">
+              <li
+                v-if="book.borrower"
+                class="book-option"
+                @click="returnBook(book.isbn)"
+              >
                 Retour du livre
               </li>
               <li class="book-option">Ajouter à une collection</li>
@@ -113,20 +135,48 @@ const search = async () => {
               </li>
             </ul>
           </div>
-          <div class="title">{{ book.title }}</div>
-          <div class="subtitle" v-if="book.subtitle">
+          <div
+            class="title"
+            contenteditable="true"
+            name="title"
+            @keypress="editField($event, book.isbn, book.title)"
+          >
+            {{ book.title }}
+          </div>
+          <div
+            class="subtitle"
+            v-if="book.subtitle"
+            contenteditable="true"
+            name="subtitle"
+            @keypress="editField($event, book.isbn, book.subtitle)"
+          >
             {{ book.subtitle }}
           </div>
-          <div class="author">{{ book.author }}</div>
+          <div
+            class="author"
+            contenteditable="true"
+            name="author"
+            @keypress="editField($event, book.isbn, book.author)"
+          >
+            {{ book.author }}
+          </div>
           <div class="date">
             {{ book.publishedDate }}
           </div>
           <div v-if="book.borrower">Prêté à {{ book.borrower }}</div>
           <div class="book-type">
-            <button :class="book.type === 'book' ? 'active' : ''" type="button" @click="setType(book.isbn, 'book')">
+            <button
+              :class="book.type === 'book' ? 'active' : ''"
+              type="button"
+              @click="setType(book.isbn, 'book')"
+            >
               Livre
             </button>
-            <button :class="book.type === 'comic' ? 'active' : ''" type="button" @click="setType(book.isbn, 'comic')">
+            <button
+              :class="book.type === 'comic' ? 'active' : ''"
+              type="button"
+              @click="setType(book.isbn, 'comic')"
+            >
               BD
             </button>
           </div>

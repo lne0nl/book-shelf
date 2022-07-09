@@ -23,16 +23,16 @@ export const useBookStore = defineStore("bookStore", {
       const data = await result.json();
       this.images = data;
     },
-    async changeBookImage(code, src) {
+    async changeBookImage(isbn, src) {
       this.books.filter((book) => {
-        if (book.isbn === code) book.image = src;
+        if (book.isbn === isbn) book.image = src;
       });
       await fetch(`${URL}/books/image/set`, {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
-        body: JSON.stringify({ code, src }),
+        body: JSON.stringify({ isbn, src }),
       });
     },
     async lendBook(bookISBN, borrower) {
@@ -88,6 +88,19 @@ export const useBookStore = defineStore("bookStore", {
       const data = await result.json();
       this.books = data;
       this.numberOfBooks = this.books.length;
+    },
+    async editField(isbn, field, newValue) {
+      await fetch(`${URL}/books/edit`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ isbn, field, newValue }),
+      });
+
+      const book = this.books.find((o) => o.isbn === isbn);
+      const bookIndex = this.books.indexOf(book);
+      this.books[bookIndex][field] = newValue;
     },
   },
 });

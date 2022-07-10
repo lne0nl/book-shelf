@@ -223,5 +223,9 @@ img {
     height: 90%;
     overflow-y: auto;
   }
+
+  .length {
+    margin-top: 95px;
+  }
 }
 </style>

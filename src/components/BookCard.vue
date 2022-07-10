@@ -277,7 +277,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
       transition: all 0.2s ease-in-out;
 
       &.active {
-        background-color: rgb(83, 139, 78);
+        background-color: black;
         color: white;
       }
 

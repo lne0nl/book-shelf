@@ -4,9 +4,7 @@ import { ref } from "vue";
 
 const store = useBookStore();
 
-let input = ref("");
-
-defineProps({
+const props = defineProps({
   title: String,
   subtitle: String,
   author: String,
@@ -16,6 +14,9 @@ defineProps({
   type: String,
   publishedDate: String,
 });
+
+let input = ref("");
+let imgUrl = ref(props.image);
 
 const togglePopin = () => {
   store.imagesVisible = !store.imagesVisible;
@@ -69,13 +70,15 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
 <template>
   <div class="book" :id="isbn">
     <div
+      v-lazy:background-image="imgUrl"
       class="book-cover"
-      :style="`background-image: url(${image})`"
       @click="
         togglePopin();
         getImages(isbn);
       "
-    ></div>
+    >
+      <div class="loader"></div>
+    </div>
     <div class="book-info">
       <div class="book-options">
         <button
@@ -168,6 +171,8 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
   background-color: rgba(0, 0, 0, 0.137);
 
   &-cover {
+    display: flex;
+    align-items: center;
     margin-right: 10px;
     height: 160px;
     width: 100px;
@@ -176,6 +181,14 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
     background-position: center;
     border: 1px solid black;
     cursor: pointer;
+
+    &[lazy="loading"] .loader {
+      display: block;
+    }
+
+    &[lazy="loaded"] .loader {
+      display: none;
+    }
   }
 
   &-info {
@@ -288,7 +301,37 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
   }
 }
 
-@media only screen and (max-width: 1024px) {
+.loader {
+  width: 40px;
+  height: 40px;
+  margin: 100px auto;
+  background-color: #333;
+
+  border-radius: 100%;  
+  -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
+  animation: sk-scaleout 1.0s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-scaleout {
+  0% { -webkit-transform: scale(0) }
+  100% {
+    -webkit-transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+@keyframes sk-scaleout {
+  0% { 
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 100% {
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+    opacity: 0;
+  }
+}
+
+@media only screen and (max-width: 720px) {
   .book {
     width: 100%;
   }

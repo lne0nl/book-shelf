@@ -217,7 +217,7 @@ img {
   flex-wrap: wrap;
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 720) {
   .overlay-content {
     width: 85%;
     height: 90%;

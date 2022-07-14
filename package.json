@@ -11,6 +11,7 @@
     "@jambonn/vue-lazyload": "^1.0.9",
     "pinia": "^2.0.14",
     "sass": "^1.53.0",
+    "search-array": "^1.6.0",
     "vite-svg-loader": "^3.4.0",
     "vue": "^3.2.37",
     "vue-router": "^4.0.16"

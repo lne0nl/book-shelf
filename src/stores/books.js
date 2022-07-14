@@ -1,21 +1,35 @@
 import { defineStore } from "pinia";
+import * as JsonSearch from "search-array";
 const URL = import.meta.env.VITE_URL;
 
 export const useBookStore = defineStore("bookStore", {
   state: () => ({
     books: [],
+    allBooks: [],
+    onlyComics: [],
+    onlyBooks: [],
     images: [],
     code: 0,
     imagesVisible: false,
     numberOfBooks: 0,
     activeFilter: "all",
+    searchResult: [],
   }),
   actions: {
-    async getBooks(filter = "all") {
-      const response = await fetch(`${URL}/books/${filter}`);
+    async getBooks() {
+      const response = await fetch(`${URL}/books`);
       const jsonResponse = await response.json();
-      this.books = jsonResponse;
+      this.allBooks = jsonResponse;
+      this.books = this.allBooks;
       this.numberOfBooks = this.books.length;
+
+      this.onlyComics = [];
+      this.onlyBooks = [];
+
+      this.books.filter((book) => {
+        if (book.type === "comic") this.onlyComics.push(book);
+        else this.onlyBooks.push(book);
+      });
     },
     async searchImages(code) {
       this.images = [];
@@ -77,17 +91,15 @@ export const useBookStore = defineStore("bookStore", {
       });
     },
     async search(searchQuery) {
-      let result = [];
       this.activeFilter = "all";
 
       if (searchQuery.length > 0) {
-        searchQuery = `"${searchQuery}"`;
-        result = await fetch(`${URL}/books/search/${searchQuery}`);
+        const searcher = new JsonSearch.default(this.allBooks);
+        const foundBooks = searcher.query(searchQuery);
+        this.books = foundBooks;
       } else {
-        result = await fetch(`${URL}/books/all`);
+        this.books = this.allBooks;
       }
-      const data = await result.json();
-      this.books = data;
       this.numberOfBooks = this.books.length;
     },
     async editField(isbn, field, newValue) {
@@ -106,7 +118,11 @@ export const useBookStore = defineStore("bookStore", {
     async filterBooks(filter) {
       if (filter !== this.activeFilter) {
         this.activeFilter = filter;
-        this.getBooks(filter);
+        if (filter === "comic") this.books = this.onlyComics;
+        else if (filter === "book") this.books = this.onlyBooks;
+        else this.books = this.allBooks;
+
+        this.numberOfBooks = this.books.length;
       }
     },
   },

@@ -28,3 +28,4 @@ coverage
 *.sw?
 
 .env.production
+node-app.code-workspace

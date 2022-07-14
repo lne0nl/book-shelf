@@ -2,6 +2,7 @@
 import BookCard from "./components/BookCard.vue";
 import BookSvg from "@/assets/read-book.svg";
 import SearchIcon from "@/assets/search.svg";
+import AngleUp from "@/assets/angle-up.svg";
 import { useBookStore } from "@/stores/books";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
@@ -24,15 +25,22 @@ const changeImage = async (event) => {
 
 const search = async () => {
   store.search(searchQuery.value);
+  backToTop();
 };
 
 const filterBooks = async (e) => {
   searchQuery.value = "";
   store.filterBooks(e.target.dataset.filter);
+  backToTop();
+};
+
+const backToTop = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 </script>
 
 <template>
+  <div class="to-top" @click="backToTop"><AngleUp /></div>
   <div class="length">
     <div>
       <b>{{ numberOfBooks }}</b> livre{{ numberOfBooks > 1 ? "s" : "" }}
@@ -217,6 +225,19 @@ img {
   flex-wrap: wrap;
 }
 
+.to-top {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+  background-color: white;
+  padding: 10px;
+  cursor: pointer;
+}
+
 @media only screen and (max-width: 720px) {
   .overlay-content {
     width: 85%;
@@ -226,6 +247,13 @@ img {
 
   .length {
     margin-top: 95px;
+  }
+
+  .to-top {
+    left: 50%;
+    right: unset;
+    bottom: 10px;
+    transform: translateX(-50%);
   }
 }
 </style>

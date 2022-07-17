@@ -54,113 +54,119 @@ const changeView = async (e) => {
 </script>
 
 <template>
-  <div class="to-top" @click="backToTop"><AngleUp /></div>
-  <div class="length">
-    <div>
-      <b>{{ view !== "list" ? numberOfBooks : store.allBooks.length }}</b>
-      livre{{ numberOfBooks > 1 ? "s" : "" }}
+  <div class="wrapper dark">
+    <div class="to-top" @click="backToTop"><AngleUp /></div>
+    <div class="length">
+      <div>
+        <b>{{ view !== "list" ? numberOfBooks : store.allBooks.length }}</b>
+        livre{{ numberOfBooks > 1 ? "s" : "" }}
+      </div>
+      <div class="view">
+        <button
+          type="button"
+          :class="['view-button', store.view === 'list' ? 'active' : '']"
+          @click="changeView"
+          data-view="list"
+        >
+          <ListSvg />
+        </button>
+        <button
+          type="button"
+          :class="['view-button', store.view === 'grid' ? 'active' : '']"
+          @click="changeView"
+          data-view="grid"
+        >
+          <GridSvg />
+        </button>
+      </div>
     </div>
-    <div class="view">
-      <button
-        type="button"
-        :class="['view-button', store.view === 'list' ? 'active' : '']"
-        @click="changeView"
-        data-view="list"
-      >
-        <ListSvg />
-      </button>
-      <button
-        type="button"
-        :class="['view-button', store.view === 'grid' ? 'active' : '']"
-        @click="changeView"
-        data-view="grid"
-      >
-        <GridSvg />
-      </button>
+    <div v-if="loading" class="loader-container">
+      <div class="loader"></div>
     </div>
-  </div>
-  <div v-if="loading" class="loader-container">
-    <div class="loader"></div>
-  </div>
-  <div v-if="!loading">
-    <div class="grid" v-if="view === 'grid'">
-      <BookCard
-        v-for="book in books"
-        :key="book"
-        :title="book.title"
-        :subtitle="book.subtitle"
-        :author="book.author"
-        :isbn="book.isbn"
-        :image="book.image"
-        :borrower="book.borrower"
-        :type="book.type"
-        :publishedDate="book.publishedDate"
-        :imgCode="book.imgCode"
-      />
-    </div>
-    <div class="list" v-if="view === 'list'">
-      <div v-for="author in listBooks" :key="author">
-        <h3>{{ author.author }}</h3>
-        <div v-for="book in author.books" :key="book">
-          {{ book.title }}
+    <div v-if="!loading">
+      <div class="grid" v-if="view === 'grid'">
+        <BookCard
+          v-for="book in books"
+          :key="book"
+          :title="book.title"
+          :subtitle="book.subtitle"
+          :author="book.author"
+          :isbn="book.isbn"
+          :image="book.image"
+          :borrower="book.borrower"
+          :type="book.type"
+          :publishedDate="book.publishedDate"
+          :imgCode="book.imgCode"
+        />
+      </div>
+      <div class="list" v-if="view === 'list'">
+        <div v-for="author in listBooks" :key="author">
+          <h3>{{ author.author }}</h3>
+          <div v-for="book in author.books" :key="book">
+            {{ book.title }}
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div v-if="imagesVisible" class="popin">
-    <div class="overlay" @click="togglePopin"></div>
-    <div class="overlay-content">
-      <div v-if="images.length" class="images">
-        <div v-for="image in images" :key="image" class="image">
-          <img :src="image.url" @click="changeImage" />
+    <div v-if="imagesVisible" class="popin">
+      <div class="overlay" @click="togglePopin"></div>
+      <div class="overlay-content">
+        <div v-if="images.length" class="images">
+          <div v-for="image in images" :key="image" class="image">
+            <img :src="image.url" @click="changeImage" />
+          </div>
         </div>
       </div>
     </div>
+    <h1>
+      <div class="display-type" v-if="view !== 'list'">
+        <div
+          :class="activeFilter === 'book' ? 'active' : ''"
+          data-filter="book"
+          @click="filterBooks"
+        >
+          Livres
+        </div>
+        <div
+          :class="activeFilter === 'comic' ? 'active' : ''"
+          data-filter="comic"
+          @click="filterBooks"
+        >
+          Bds
+        </div>
+        <div
+          :class="activeFilter === 'all' ? 'active' : ''"
+          data-filter="all"
+          @click="filterBooks"
+        >
+          Tout
+        </div>
+      </div>
+
+      <div class="logo">
+        <BookSvg />
+      </div>
+
+      <div class="search" v-if="view !== 'list'">
+        <input
+          type="text"
+          placeholder="Recherche..."
+          v-model="searchQuery"
+          @keyup="search"
+        />
+        <SearchIcon class="search-icon" />
+      </div>
+    </h1>
   </div>
-  <h1>
-    <div class="display-type" v-if="view !== 'list'">
-      <div
-        :class="activeFilter === 'book' ? 'active' : ''"
-        data-filter="book"
-        @click="filterBooks"
-      >
-        Livres
-      </div>
-      <div
-        :class="activeFilter === 'comic' ? 'active' : ''"
-        data-filter="comic"
-        @click="filterBooks"
-      >
-        Bds
-      </div>
-      <div
-        :class="activeFilter === 'all' ? 'active' : ''"
-        data-filter="all"
-        @click="filterBooks"
-      >
-        Tout
-      </div>
-    </div>
-
-    <div class="logo">
-      <BookSvg />
-    </div>
-
-    <div class="search" v-if="view !== 'list'">
-      <input
-        type="text"
-        placeholder="Recherche..."
-        v-model="searchQuery"
-        @keyup="search"
-      />
-      <SearchIcon class="search-icon" />
-    </div>
-  </h1>
 </template>
 
 <style lang="scss">
 @import "@/assets/base.css";
+
+.wrapper {
+  padding: 0 30px;
+}
 
 .overlay {
   position: absolute;
@@ -211,7 +217,7 @@ h1 {
   top: 0;
   background-color: black;
   margin: 0;
-  padding: 10px;
+  padding: 10px 30px;
 }
 
 .logo {
@@ -249,7 +255,7 @@ img {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
-  margin-top: 70px;
+  padding-top: 70px;
 }
 
 .search {
@@ -309,7 +315,9 @@ img {
 
 .loader-container {
   position: fixed;
-  top: 56px;
+  display: flex;
+  align-items: center;
+  top: 0;
   right: 0;
   bottom: 0;
   left: 0;
@@ -317,18 +325,55 @@ img {
 }
 
 .loader {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   margin: 100px auto;
   background-color: #333;
 
   border-radius: 100%;
   -webkit-animation: sk-scaleout 1s infinite ease-in-out;
   animation: sk-scaleout 1s infinite ease-in-out;
+}
+
+body.dark {
+  background-color: #35373b;
+  color: #c9d1d9;
+
+  h1 {
+    background-color: #202226;
+    color: #c9d1d9;
+  }
+
+  .loader-container {
+    background-color: #35373b;
+  }
+
+  .loader {
+    background-color: #c9d1d9;
+  }
+
+  .book {
+    background-color: #202226;
+
+    &-type {
+      button {
+        background-color: #c9d1d9;
+
+        &.active {
+          color: #c9d1d9;
+          background-color: black;
+        }
+      }
+    }
+  }
+
+  .display-type {
+    color: #c9d1d9;
+  }
+
+  .view-button.active {
+    background-color: #202226;
+  }
 }
 
 @-webkit-keyframes sk-scaleout {
@@ -354,6 +399,14 @@ img {
 }
 
 @media only screen and (max-width: 720px) {
+  .wrapper {
+    padding: 0 10px;
+  }
+
+  h1 {
+    padding: 10px;
+  }
+
   .overlay-content {
     width: 85%;
     height: 90%;
@@ -361,7 +414,7 @@ img {
   }
 
   .length {
-    margin-top: 95px;
+    padding-top: 95px;
   }
 
   .to-top {

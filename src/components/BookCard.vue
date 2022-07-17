@@ -173,7 +173,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
   margin-bottom: 10px;
   padding: 10px 45px 10px 10px;
   border-radius: 5px;
-  width: 400px;
+  width: 360px;
   background-color: rgba(0, 0, 0, 0.137);
 
   &-cover {
@@ -202,7 +202,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
   }
 
   &-title {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: bold;
   }
 

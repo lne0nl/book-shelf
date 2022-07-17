@@ -246,6 +246,7 @@ img {
 
 .length {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
   margin-top: 70px;

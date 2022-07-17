@@ -289,6 +289,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
 
     button {
       border: none;
+      border-radius: 5px;;
       padding: 8px;
       display: flex;
       align-items: center;
@@ -301,7 +302,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
       }
 
       &:first-child {
-        margin-right: 10px;
+        margin-right: 5px;
       }
     }
   }
@@ -343,6 +344,28 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
 @media only screen and (max-width: 720px) {
   .book {
     width: 100%;
+
+    &-title {
+      font-size: 16px;
+    }
+
+    &-subtitle {
+      font-size: 14px;
+    }
+
+    &-author {
+      margin-top: 0;
+      font-size: 14px;
+    }
+
+    &-type button {
+      font-size: 14px;
+    }
+
+    &-cover {
+      height: 140px;
+      width: 90px;
+    }
   }
 }
 </style>

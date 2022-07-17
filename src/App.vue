@@ -218,6 +218,10 @@ h1 {
   background-color: black;
   margin: 0;
   padding: 10px 30px;
+
+  & > div {
+    width: 33.33%;
+  }
 }
 
 .logo {
@@ -259,13 +263,16 @@ img {
 }
 
 .search {
-  color: white;
   display: flex;
+  justify-content: flex-end;
 }
 
 .search input[type="text"] {
   font-size: inherit;
   font-family: inherit;
+  color: inherit;
+  border: none;
+  padding: 0 5px;
 }
 
 .search-icon {
@@ -352,6 +359,10 @@ body.dark {
     background-color: #c9d1d9;
   }
 
+  .search input[type="text"] {
+    background-color: #35373b;
+  }
+
   .book {
     background-color: #202226;
 
@@ -405,6 +416,10 @@ body.dark {
 
   h1 {
     padding: 10px;
+
+    & > div {
+      width: unset;
+    }
   }
 
   .overlay-content {

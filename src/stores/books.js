@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import * as JsonSearch from "search-array";
+import * as Utils from "@/utils";
 const URL = import.meta.env.VITE_URL;
 
 export const useBookStore = defineStore("bookStore", {
@@ -8,28 +9,38 @@ export const useBookStore = defineStore("bookStore", {
     allBooks: [],
     onlyComics: [],
     onlyBooks: [],
+    listBooks: [],
     images: [],
     code: 0,
     imagesVisible: false,
     numberOfBooks: 0,
     activeFilter: "all",
     searchResult: [],
+    loading: true,
+    view: "grid",
   }),
   actions: {
     async getBooks() {
-      const response = await fetch(`${URL}/books`);
-      const jsonResponse = await response.json();
-      this.allBooks = jsonResponse;
-      this.books = this.allBooks;
-      this.numberOfBooks = this.books.length;
+      try {
+        this.loading = true;
+        const response = await fetch(`${URL}/books`);
+        const jsonResponse = await response.json();
+        this.allBooks = jsonResponse;
+        this.books = this.allBooks;
+        this.numberOfBooks = this.books.length;
 
-      this.onlyComics = [];
-      this.onlyBooks = [];
+        this.onlyComics = [];
+        this.onlyBooks = [];
 
-      this.books.filter((book) => {
-        if (book.type === "comic") this.onlyComics.push(book);
-        else this.onlyBooks.push(book);
-      });
+        this.books.filter((book) => {
+          if (book.type === "comic") this.onlyComics.push(book);
+          else this.onlyBooks.push(book);
+        });
+
+        this.listBooks = Utils.getBooksList(this.allBooks);
+      } finally {
+        this.loading = false;
+      }
     },
     async searchImages(code) {
       this.images = [];
@@ -38,15 +49,16 @@ export const useBookStore = defineStore("bookStore", {
       this.images = data;
     },
     async changeBookImage(isbn, src) {
-      this.books.filter((book) => {
-        if (book.isbn === isbn) book.image = src;
-      });
-      await fetch(`${URL}/books/image/set`, {
+      const response = await fetch(`${URL}/books/image/set`, {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
         body: JSON.stringify({ isbn, src }),
+      });
+      const json = await response.json();
+      this.books.filter((book) => {
+        if (book.isbn === isbn) book.imgCode = json.imgCode;
       });
     },
     async lendBook(bookISBN, borrower) {
@@ -95,7 +107,7 @@ export const useBookStore = defineStore("bookStore", {
 
       if (searchQuery.length > 0) {
         const searcher = new JsonSearch.default(this.allBooks);
-        const foundBooks = searcher.query(searchQuery);
+        const foundBooks = searcher.query(`"${searchQuery}"`);
         this.books = foundBooks;
       } else {
         this.books = this.allBooks;

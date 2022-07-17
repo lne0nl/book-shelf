@@ -13,10 +13,15 @@ const props = defineProps({
   borrower: String,
   type: String,
   publishedDate: String,
+  imgCode: String,
 });
 
 let input = ref("");
-let imgUrl = ref(props.image);
+let imgCode = ref(props.imgCode);
+
+const imgCSS = {
+  backgroundImage: `url("data:image/jpg;base64,${imgCode.value}")`,
+};
 
 const togglePopin = () => {
   store.imagesVisible = !store.imagesVisible;
@@ -63,6 +68,7 @@ const editField = async (e, isbn, initialValue) => {
 
     if (newValue !== initialValue) await store.editField(isbn, field, newValue);
   }
+  // v-lazy:background-image="imgCode"
 };
 
 const setType = async (isbn, type) => await store.setType(isbn, type);
@@ -70,14 +76,14 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
 <template>
   <div class="book" :id="isbn">
     <div
-      v-lazy:background-image="imgUrl"
       class="book-cover"
+      :style="imgCSS"
       @click="
         togglePopin();
         getImages(isbn);
       "
     >
-      <div class="loader"></div>
+      <!-- <div class="loader"></div> -->
     </div>
     <div class="book-info">
       <div class="book-options">
@@ -307,26 +313,29 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
   margin: 100px auto;
   background-color: #333;
 
-  border-radius: 100%;  
-  -webkit-animation: sk-scaleout 1.0s infinite ease-in-out;
-  animation: sk-scaleout 1.0s infinite ease-in-out;
+  border-radius: 100%;
+  -webkit-animation: sk-scaleout 1s infinite ease-in-out;
+  animation: sk-scaleout 1s infinite ease-in-out;
 }
 
 @-webkit-keyframes sk-scaleout {
-  0% { -webkit-transform: scale(0) }
+  0% {
+    -webkit-transform: scale(0);
+  }
   100% {
-    -webkit-transform: scale(1.0);
+    -webkit-transform: scale(1);
     opacity: 0;
   }
 }
 
 @keyframes sk-scaleout {
-  0% { 
+  0% {
     -webkit-transform: scale(0);
     transform: scale(0);
-  } 100% {
-    -webkit-transform: scale(1.0);
-    transform: scale(1.0);
+  }
+  100% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
     opacity: 0;
   }
 }

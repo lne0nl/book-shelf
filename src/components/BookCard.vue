@@ -68,13 +68,45 @@ const editField = async (e, isbn, initialValue) => {
 
     if (newValue !== initialValue) await store.editField(isbn, field, newValue);
   }
-  // v-lazy:background-image="imgCode"
 };
 
 const setType = async (isbn, type) => await store.setType(isbn, type);
 </script>
 <template>
   <div class="book" :id="isbn">
+    <button
+      type="button"
+      class="book-options-button"
+      @click="openOptions"
+      :data-book="isbn"
+    >
+      ···
+    </button>
+    <div class="book-options">
+      <ul class="book-options-list">
+        <li v-if="!borrower" class="book-option">
+          <form @submit="lendBook" :data-book="isbn">
+            <label>
+              Prêter le livre à
+              <input
+                name="name"
+                type="text"
+                v-model="input"
+                autocomplete="false"
+              />
+            </label>
+            <button type="submit">OK</button>
+          </form>
+        </li>
+        <li v-if="borrower" class="book-option" @click="returnBook(isbn)">
+          Retour du livre
+        </li>
+        <li class="book-option">Ajouter à une collection</li>
+        <li class="book-option" @click="removeBook(isbn)">
+          Supprimer le livre
+        </li>
+      </ul>
+    </div>
     <div
       class="book-cover"
       :style="imgCSS"
@@ -82,43 +114,8 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
         togglePopin();
         getImages(isbn);
       "
-    >
-      <!-- <div class="loader"></div> -->
-    </div>
+    ></div>
     <div class="book-info">
-      <div class="book-options">
-        <button
-          type="button"
-          class="book-options-button"
-          @click="openOptions"
-          :data-book="isbn"
-        >
-          ···
-        </button>
-        <ul class="book-options-list">
-          <li v-if="!borrower" class="book-option">
-            <form @submit="lendBook" :data-book="isbn">
-              <label>
-                Prêter le livre à
-                <input
-                  name="name"
-                  type="text"
-                  v-model="input"
-                  autocomplete="false"
-                />
-              </label>
-              <button type="submit">OK</button>
-            </form>
-          </li>
-          <li v-if="borrower" class="book-option" @click="returnBook(isbn)">
-            Retour du livre
-          </li>
-          <li class="book-option">Ajouter à une collection</li>
-          <li class="book-option" @click="removeBook(isbn)">
-            Supprimer le livre
-          </li>
-        </ul>
-      </div>
       <div
         class="book-title"
         contenteditable="true"
@@ -142,9 +139,6 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
         @keypress="editField($event, isbn, author)"
       >
         {{ author }}
-      </div>
-      <div class="book-date">
-        {{ publishedDate }}
       </div>
       <div v-if="borrower">Prêté à {{ borrower }}</div>
       <div class="book-type">
@@ -174,7 +168,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
   padding: 10px 45px 10px 10px;
   border-radius: 5px;
   width: 360px;
-  background-color: rgba(0, 0, 0, 0.137);
+  background-color: rgb(226, 226, 226);
 
   &-cover {
     display: flex;
@@ -221,43 +215,53 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
 
   &-options {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 25.33px;
-    height: 17px;
+    z-index: 1;
+    top: 0;
+    right: 0;
     font-size: 18px;
-    border-radius: 8px;
-    background-color: white;
+    border-radius: 5px;
+    background-color: rgb(226, 226, 226);
     overflow: hidden;
-    color: white;
 
     &-button {
       position: absolute;
-      top: 0;
-      right: 0;
-      background-color: transparent;
+      z-index: 2;
+      top: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 20px;
+      height: 20px;
+      font-weight: bold;
+      background-color: white;
       border: none;
       cursor: pointer;
+      border-radius: 50%;
     }
 
     &-list {
       display: flex;
       flex-direction: column;
       justify-content: center;
-      height: 100%;
+      width: 0;
+      height: 0;
       padding-left: 15px;
     }
   }
 
-  &.active .book-options {
-    z-index: 1;
-    left: 10px;
-    bottom: 10px;
-    top: 10px;
-    right: 10px;
-    width: auto;
-    height: auto;
-    color: black;
+  &.active {
+    .book-options {
+      left: 0;
+      bottom: 0;
+      top: 0;
+      right: 0;
+    }
+
+    .book-options-list {
+      width: auto;
+      height: 100%;
+    }
   }
 
   &-option {
@@ -269,6 +273,8 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
       margin-right: 15px;
       border: none;
       border-bottom: 1px solid black;
+      background-color: transparent;
+      color: inherit;
       font-size: inherit;
     }
 
@@ -277,6 +283,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
       background-color: transparent;
       border: none;
       font-size: inherit;
+      color: inherit;
       cursor: pointer;
     }
   }

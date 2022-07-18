@@ -376,6 +376,22 @@ body.dark {
         }
       }
     }
+
+    &-options {
+      color: #c9d1d9;
+      background-color: #202226;
+
+      &-button {
+        background-color: #35373b;
+        color: #c9d1d9;
+      }
+    }
+
+    &-option {
+      input[type="text"] {
+        border-bottom-color: #c9d1d9;;
+      }
+    }
   }
 
   .display-type {

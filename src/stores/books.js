@@ -106,7 +106,13 @@ export const useBookStore = defineStore("bookStore", {
       this.activeFilter = "all";
 
       if (searchQuery.length > 0) {
-        const searcher = new JsonSearch.default(this.allBooks);
+        const searcher = new JsonSearch.default(this.allBooks, {
+          indice: {
+            title: "title",
+            author: "author",
+            subtitle: "subtitle",
+          },
+        });
         const foundBooks = searcher.query(`"${searchQuery}"`);
         this.books = foundBooks;
       } else {

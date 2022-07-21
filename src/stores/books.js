@@ -12,12 +12,14 @@ export const useBookStore = defineStore("bookStore", {
     listBooks: [],
     images: [],
     code: 0,
-    imagesVisible: false,
     numberOfBooks: 0,
     activeFilter: "all",
     searchResult: [],
     loading: true,
     view: "grid",
+    popin: "",
+    collections: [],
+    collectionsSearch: [],
   }),
   actions: {
     async getBooks() {
@@ -37,29 +39,42 @@ export const useBookStore = defineStore("bookStore", {
           else this.onlyBooks.push(book);
         });
 
+        const collections = [];
+
+        this.allBooks.forEach((book) => {
+          if (book.set && !collections.includes(book.set)) {
+            collections.push(book.set);
+            this.collections.push({ name: book.set });
+          }
+        });
+
         this.listBooks = Utils.getBooksList(this.allBooks);
       } finally {
         this.loading = false;
       }
     },
-    async searchImages(code) {
+    async searchImages() {
       this.images = [];
-      const result = await fetch(`${URL}/books/image/${code}`);
+      const result = await fetch(`${URL}/books/image/${this.code}`);
       const data = await result.json();
       this.images = data;
     },
     async changeBookImage(isbn, src) {
-      const response = await fetch(`${URL}/books/image/set`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify({ isbn, src }),
-      });
-      const json = await response.json();
-      this.books.filter((book) => {
-        if (book.isbn === isbn) book.imgCode = json.imgCode;
-      });
+      try {
+        const response = await fetch(`${URL}/books/image/set`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify({ isbn, src }),
+        });
+        const json = await response.json();
+        this.books.filter((book) => {
+          if (book.isbn === isbn) book.imgCode = json.imgCode;
+        });
+      } finally {
+        this.popin = "";
+      }
     },
     async lendBook(bookISBN, borrower) {
       this.books.filter((book) => {
@@ -111,6 +126,7 @@ export const useBookStore = defineStore("bookStore", {
             title: "title",
             author: "author",
             subtitle: "subtitle",
+            set: "set",
           },
         });
         const foundBooks = searcher.query(`"${searchQuery}"`);
@@ -142,6 +158,28 @@ export const useBookStore = defineStore("bookStore", {
 
         this.numberOfBooks = this.books.length;
       }
+    },
+    async addToCollection(collection) {
+      try {
+        await fetch(`${URL}/books/set/add`, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify({ isbn: this.code, collection }),
+        });
+      } finally {
+        this.popin = "";
+      }
+    },
+    async searchCollection(collection) {
+      const searcher = new JsonSearch.default(this.collections);
+      const foundCollections = searcher.query(`"${collection}"`, {
+        indice: {
+          name: "name",
+        },
+      });
+      this.collectionsSearch = foundCollections;
     },
   },
 });

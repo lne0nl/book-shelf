@@ -14,6 +14,7 @@ const props = defineProps({
   type: String,
   publishedDate: String,
   imgCode: String,
+  set: String,
 });
 
 let input = ref("");
@@ -23,13 +24,10 @@ const imgCSS = {
   backgroundImage: `url("data:image/jpg;base64,${imgCode.value}")`,
 };
 
-const togglePopin = () => {
-  store.imagesVisible = !store.imagesVisible;
-};
-
 const getImages = (code) => {
   store.code = code;
-  store.searchImages(code);
+  store.popin = "images";
+  store.searchImages();
 };
 
 const openOptions = (event) => {
@@ -71,6 +69,11 @@ const editField = async (e, isbn, initialValue) => {
 };
 
 const setType = async (isbn, type) => await store.setType(isbn, type);
+
+const openCollections = (code) => {
+  store.code = code;
+  store.popin = "collections";
+};
 </script>
 <template>
   <div class="book" :id="isbn">
@@ -101,20 +104,15 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
         <li v-if="borrower" class="book-option" @click="returnBook(isbn)">
           Retour du livre
         </li>
-        <li class="book-option">Ajouter à une collection</li>
+        <li class="book-option" @click="openCollections(isbn)">
+          Ajouter à une collection
+        </li>
         <li class="book-option" @click="removeBook(isbn)">
           Supprimer le livre
         </li>
       </ul>
     </div>
-    <div
-      class="book-cover"
-      :style="imgCSS"
-      @click="
-        togglePopin();
-        getImages(isbn);
-      "
-    ></div>
+    <div class="book-cover" :style="imgCSS" @click="getImages(isbn)"></div>
     <div class="book-info">
       <div
         class="book-title"
@@ -140,6 +138,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
       >
         {{ author }}
       </div>
+      <div>{{ set }}</div>
       <div v-if="borrower">Prêté à {{ borrower }}</div>
       <div class="book-type">
         <button
@@ -247,6 +246,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
       width: 0;
       height: 0;
       padding-left: 15px;
+      font-size: 16px;
     }
   }
 
@@ -296,7 +296,7 @@ const setType = async (isbn, type) => await store.setType(isbn, type);
 
     button {
       border: none;
-      border-radius: 5px;;
+      border-radius: 5px;
       padding: 8px;
       display: flex;
       align-items: center;

@@ -8,34 +8,39 @@ import AngleUp from "@/assets/angle-up.svg";
 import { useBookStore } from "@/stores/books";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
+import PopinComponent from "./components/PopinComponent.vue";
 const store = useBookStore();
 const {
   books,
   listBooks,
-  imagesVisible,
   images,
   numberOfBooks,
   activeFilter,
   loading,
   view,
+  popin,
+  collectionsSearch,
 } = storeToRefs(store);
 store.getBooks();
 
 let searchQuery = ref("");
-
-const togglePopin = () => {
-  store.imagesVisible = !store.imagesVisible;
-};
+let collection = ref("");
 
 const changeImage = async (event) => {
   let src = event.target.src;
   await store.changeBookImage(store.code, src);
-  togglePopin();
 };
 
 const search = async () => {
   store.search(searchQuery.value);
   backToTop();
+};
+
+const typeCollection = async () =>
+  await store.searchCollection(collection.value);
+
+const addToCollection = async () => {
+  await store.addToCollection(collection.value);
 };
 
 const filterBooks = async (e) => {
@@ -50,6 +55,10 @@ const backToTop = () => {
 
 const changeView = async (e) => {
   store.view = e.target.dataset.view;
+};
+
+const fillCollectionSearch = (e) => {
+  collection.value = e.target.innerText;
 };
 </script>
 
@@ -97,6 +106,7 @@ const changeView = async (e) => {
           :type="book.type"
           :publishedDate="book.publishedDate"
           :imgCode="book.imgCode"
+          :set="book.set"
         />
       </div>
       <div class="list" v-if="view === 'list'">
@@ -109,16 +119,54 @@ const changeView = async (e) => {
       </div>
     </div>
 
-    <div v-if="imagesVisible" class="popin">
-      <div class="overlay" @click="togglePopin"></div>
-      <div class="overlay-content">
-        <div v-if="images.length" class="images">
-          <div v-for="image in images" :key="image" class="image">
-            <img :src="image.url" @click="changeImage" />
-          </div>
+    <PopinComponent
+      v-if="popin === 'collections'"
+      title="Ajouter à une collection"
+      id="collections"
+    >
+      <div class="collections-wrapper">
+        <input
+          type="text"
+          autocomplete="false"
+          class="collections-input"
+          v-model="collection"
+          placeholder="Nom de la collection"
+          @keyup="typeCollection"
+        />
+        <div v-if="collectionsSearch.length">
+          <ul class="collection-search">
+            <li
+              v-for="collection in collectionsSearch"
+              :key="collection.name"
+              class="collection-search-item"
+              @click="fillCollectionSearch"
+            >
+              {{ collection.name }}
+            </li>
+          </ul>
+        </div>
+        <button
+          type="button"
+          class="collections-submit"
+          @click="addToCollection"
+        >
+          Ajouter
+        </button>
+      </div>
+    </PopinComponent>
+
+    <PopinComponent
+      v-if="popin === 'images'"
+      title="Choisissez une image"
+      id="images"
+    >
+      <div v-if="images.length" class="images">
+        <div v-for="image in images" :key="image" class="image">
+          <img :src="image.url" @click="changeImage" />
         </div>
       </div>
-    </div>
+    </PopinComponent>
+
     <h1>
       <div class="display-type" v-if="view !== 'list'">
         <div
@@ -168,29 +216,6 @@ const changeView = async (e) => {
   padding: 0 30px;
 }
 
-.overlay {
-  position: absolute;
-  z-index: 1;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.589);
-}
-
-.overlay-content {
-  position: fixed;
-  z-index: 100;
-  max-width: 95%;
-  top: 50%;
-  left: 50%;
-  max-height: 95%;
-  padding: 20px;
-  background-color: white;
-  border-radius: 10px;
-  transform: translate(-50%, -50%);
-}
-
 .images {
   display: flex;
   justify-content: center;
@@ -200,6 +225,37 @@ const changeView = async (e) => {
 
 .image {
   margin: 0 5px;
+}
+
+.collections {
+  &-wrapper {
+    min-height: 450px;
+  }
+
+  &-input {
+    width: 100%;
+    height: 42px;
+    background: transparent;
+    border: 1px solid black;
+    border-radius: 5px;
+    color: inherit;
+    font-size: 18px;
+    text-align: center;
+    font-weight: bold;
+  }
+
+  &-submit {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+  }
 }
 
 h1 {
@@ -280,6 +336,18 @@ img {
   margin-left: 10px;
 }
 
+.collection-search {
+  margin-top: 10px;
+
+  &-item {
+    padding: 15px;
+    cursor: pointer;
+    font-size: 16px;
+    background-color: #202226;
+    margin-bottom: 4px;
+  }
+}
+
 .grid {
   display: flex;
   justify-content: space-between;
@@ -346,6 +414,10 @@ body.dark {
   background-color: #35373b;
   color: #c9d1d9;
 
+  .overlay-content {
+    background-color: #35373b;
+  }
+
   h1 {
     background-color: #202226;
     color: #c9d1d9;
@@ -389,8 +461,21 @@ body.dark {
 
     &-option {
       input[type="text"] {
-        border-bottom-color: #c9d1d9;;
+        border-bottom-color: #c9d1d9;
       }
+    }
+  }
+
+  .collections {
+    &-input {
+      background: transparent;
+      border: none;
+      background-color: #202226;
+    }
+
+    &-submit {
+      color: inherit;
+      background-color: #202226;
     }
   }
 

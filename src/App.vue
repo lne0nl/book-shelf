@@ -57,8 +57,9 @@ const changeView = async (e) => {
   store.view = e.target.dataset.view;
 };
 
-const fillCollectionSearch = (e) => {
+const fillCollectionSearch = async (e) => {
   collection.value = e.target.innerText;
+  await addToCollection(collection.value);
 };
 </script>
 
@@ -96,7 +97,7 @@ const fillCollectionSearch = (e) => {
       <div class="grid" v-if="view === 'grid'">
         <BookCard
           v-for="book in books"
-          :key="book"
+          :key="book._id"
           :title="book.title"
           :subtitle="book.subtitle"
           :author="book.author"
@@ -127,6 +128,7 @@ const fillCollectionSearch = (e) => {
       <div class="collections-wrapper">
         <input
           type="text"
+          id="collection-search"
           autocomplete="false"
           class="collections-input"
           v-model="collection"
@@ -337,6 +339,8 @@ img {
 }
 
 .collection-search {
+  max-height: 350px;
+  overflow-y: auto;
   margin-top: 10px;
 
   &-item {

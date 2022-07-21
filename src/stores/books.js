@@ -20,6 +20,7 @@ export const useBookStore = defineStore("bookStore", {
     popin: "",
     collections: [],
     collectionsSearch: [],
+    tempCode: "",
   }),
   actions: {
     async getBooks() {
@@ -69,11 +70,12 @@ export const useBookStore = defineStore("bookStore", {
           body: JSON.stringify({ isbn, src }),
         });
         const json = await response.json();
+        this.tempCode = json.imgCode;
         this.books.filter((book) => {
           if (book.isbn === isbn) book.imgCode = json.imgCode;
         });
       } finally {
-        this.popin = "";
+        this.closePopin();
       }
     },
     async lendBook(bookISBN, borrower) {
@@ -169,7 +171,10 @@ export const useBookStore = defineStore("bookStore", {
           body: JSON.stringify({ isbn: this.code, collection }),
         });
       } finally {
-        this.popin = "";
+        const book = this.books.find((o) => o.isbn === this.code);
+        const bookIndex = this.books.indexOf(book);
+        this.books[bookIndex].set = collection;
+        this.closePopin();
       }
     },
     async searchCollection(collection) {
@@ -180,6 +185,14 @@ export const useBookStore = defineStore("bookStore", {
         },
       });
       this.collectionsSearch = foundCollections;
+    },
+    async openPopin(name) {
+      this.popin = name;
+      document.body.style.overflowY = "hidden";
+    },
+    closePopin() {
+      this.popin = "";
+      document.body.style.overflowY = "auto";
     },
   },
 });

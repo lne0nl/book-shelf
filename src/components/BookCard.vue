@@ -4,7 +4,7 @@ import { ref } from "vue";
 
 const store = useBookStore();
 
-const props = defineProps({
+defineProps({
   title: String,
   subtitle: String,
   author: String,
@@ -18,15 +18,10 @@ const props = defineProps({
 });
 
 let input = ref("");
-let imgCode = ref(props.imgCode);
 
-const imgCSS = {
-  backgroundImage: `url("data:image/jpg;base64,${imgCode.value}")`,
-};
-
-const getImages = (code) => {
+const getImages = async (code) => {
   store.code = code;
-  store.popin = "images";
+  await store.openPopin("images");
   store.searchImages();
 };
 
@@ -70,9 +65,11 @@ const editField = async (e, isbn, initialValue) => {
 
 const setType = async (isbn, type) => await store.setType(isbn, type);
 
-const openCollections = (code) => {
-  store.code = code;
-  store.popin = "collections";
+const openCollections = async (isbn) => {
+  document.getElementById(isbn).classList.remove("active");
+  store.code = isbn;
+  await store.openPopin("collections");
+  document.getElementById("collection-search").focus();
 };
 </script>
 <template>
@@ -112,7 +109,11 @@ const openCollections = (code) => {
         </li>
       </ul>
     </div>
-    <div class="book-cover" :style="imgCSS" @click="getImages(isbn)"></div>
+    <div
+      class="book-cover"
+      :style="`background-image: url(data:image/jpg;base64,${imgCode})`"
+      @click="getImages(isbn)"
+    ></div>
     <div class="book-info">
       <div
         class="book-title"

@@ -6,9 +6,8 @@ defineProps({
   title: String,
 });
 
-const closePopin = (e) => {
-  e.stopPropagation();
-  store.popin = "";
+const closePopin = () => {
+  store.closePopin();
 };
 </script>
 <template>

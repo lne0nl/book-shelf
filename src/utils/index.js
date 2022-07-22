@@ -35,5 +35,11 @@ export const getCollections = (books) => {
     });
   });
 
+  bookList.forEach((item) => {
+    item.books.sort((a, b) => {
+      return a.volume < b.volume ? -1 : a.volume > b.volume ? 1 : 0;
+    });
+  });
+
   return bookList;
 };

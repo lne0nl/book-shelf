@@ -15,6 +15,7 @@ defineProps({
   publishedDate: String,
   imgCode: String,
   set: String,
+  volume: Number,
 });
 
 let input = ref("");
@@ -54,10 +55,12 @@ const removeBook = async (isbn) => {
 
 const editField = async (e, isbn, initialValue) => {
   if (e.key === "Enter") {
+    let newValue;
     e.target.blur();
     e.preventDefault();
     const field = e.target.getAttribute("name");
-    const newValue = e.target.innerText;
+    newValue =
+      field === "volume" ? parseInt(e.target.innerText) : e.target.innerText;
 
     if (newValue !== initialValue) await store.editField(isbn, field, newValue);
   }
@@ -139,8 +142,17 @@ const openCollections = async (isbn) => {
       >
         {{ author }}
       </div>
-      <div class="book-collection" v-if="set">{{ set }}</div>
-      <!-- <div class="book-collection">{{ set }}</div> -->
+      <div class="book-collection" v-if="set">
+        {{ set }}
+        <div
+          class="book-collection-volume"
+          contenteditable="true"
+          name="volume"
+          @keypress="editField($event, isbn, volume)"
+        >
+          {{ volume ? volume : "#" }}
+        </div>
+      </div>
       <div v-if="borrower">Prêté à {{ borrower }}</div>
       <div class="book-type">
         <button
@@ -220,6 +232,19 @@ const openCollections = async (isbn) => {
     padding: 5px 10px;
     background-color: rgba($color: #000000, $alpha: 0.7);
     width: 100%;
+
+    &-volume {
+      font-weight: bold;
+      background-color: white;
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      color: black;
+    }
   }
 
   &-date {

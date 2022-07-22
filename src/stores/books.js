@@ -52,7 +52,6 @@ export const useBookStore = defineStore("bookStore", {
 
         this.listBooks = Utils.getBooksList(this.allBooks);
         this.listCollections = Utils.getCollections(this.allBooks);
-        console.log(this.listCollections);
       } finally {
         this.loading = false;
       }
@@ -166,9 +165,11 @@ export const useBookStore = defineStore("bookStore", {
         body: JSON.stringify({ isbn, field, newValue }),
       });
 
-      const book = this.books.find((o) => o.isbn === isbn);
-      const bookIndex = this.books.indexOf(book);
-      this.books[bookIndex][field] = newValue;
+      if (this.activeFilter === "all") {
+        const book = this.books.find((o) => o.isbn === isbn);
+        const bookIndex = this.books.indexOf(book);
+        this.books[bookIndex][field] = newValue;
+      }
     },
     async filterBooks(filter) {
       if (filter !== this.activeFilter) {

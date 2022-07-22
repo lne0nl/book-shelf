@@ -118,6 +118,7 @@ const fillCollectionSearch = async (e) => {
           :publishedDate="book.publishedDate"
           :imgCode="book.imgCode"
           :set="book.set"
+          :volume="book.volume"
         />
       </div>
 
@@ -138,13 +139,14 @@ const fillCollectionSearch = async (e) => {
               :publishedDate="book.publishedDate"
               :imgCode="book.imgCode"
               :set="book.set"
+              :volume="book.volume"
             />
           </div>
         </div>
       </div>
 
       <div class="list" v-if="view === 'list'">
-        <div v-for="author in listBooks" :key="author">
+        <div v-for="author in listBooks" :key="author.author">
           <h3>{{ author.author }}</h3>
           <div v-for="book in author.books" :key="book">
             {{ book.title }}

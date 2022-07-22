@@ -20,6 +20,7 @@ const {
   view,
   popin,
   collectionsSearch,
+  listCollections,
 } = storeToRefs(store);
 store.getBooks();
 
@@ -69,7 +70,13 @@ const fillCollectionSearch = async (e) => {
     <div class="length">
       <div>
         <b>{{ view !== "list" ? numberOfBooks : store.allBooks.length }}</b>
-        livre{{ numberOfBooks > 1 ? "s" : "" }}
+        {{
+          activeFilter === "book" || activeFilter === "all"
+            ? "livre"
+            : activeFilter === "comic"
+            ? "bd"
+            : "collection"
+        }}{{ numberOfBooks > 1 ? "s" : "" }}
       </div>
       <div class="view">
         <button
@@ -94,7 +101,10 @@ const fillCollectionSearch = async (e) => {
       <div class="loader"></div>
     </div>
     <div v-if="!loading">
-      <div class="grid" v-if="view === 'grid'">
+      <div
+        class="grid"
+        v-if="view === 'grid' && activeFilter !== 'collections'"
+      >
         <BookCard
           v-for="book in books"
           :key="book._id"
@@ -110,6 +120,29 @@ const fillCollectionSearch = async (e) => {
           :set="book.set"
         />
       </div>
+
+      <div v-if="view === 'grid' && activeFilter === 'collections'">
+        <div v-for="collection in listCollections" :key="collection">
+          <div class="collections-title">{{ collection.collection }}</div>
+          <div class="grid-collections">
+            <BookCard
+              v-for="book in collection.books"
+              :key="book._id"
+              :title="book.title"
+              :subtitle="book.subtitle"
+              :author="book.author"
+              :isbn="book.isbn"
+              :image="book.image"
+              :borrower="book.borrower"
+              :type="book.type"
+              :publishedDate="book.publishedDate"
+              :imgCode="book.imgCode"
+              :set="book.set"
+            />
+          </div>
+        </div>
+      </div>
+
       <div class="list" v-if="view === 'list'">
         <div v-for="author in listBooks" :key="author">
           <h3>{{ author.author }}</h3>
@@ -186,6 +219,13 @@ const fillCollectionSearch = async (e) => {
           Bds
         </div>
         <div
+          :class="activeFilter === 'collections' ? 'active' : ''"
+          data-filter="collections"
+          @click="filterBooks"
+        >
+          Collections
+        </div>
+        <div
           :class="activeFilter === 'all' ? 'active' : ''"
           data-filter="all"
           @click="filterBooks"
@@ -229,7 +269,24 @@ const fillCollectionSearch = async (e) => {
   margin: 0 5px;
 }
 
+.grid-collections {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+
+  .book {
+    margin-right: 10px;
+  }
+}
+
 .collections {
+  &-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 15px 0;
+    text-transform: uppercase;
+  }
+
   &-wrapper {
     min-height: 450px;
   }
@@ -300,8 +357,8 @@ h1 {
   color: red;
 }
 
-.display-type div:nth-child(2) {
-  margin: 0 10px;
+.display-type div:not(:last-child) {
+  margin-right: 10px;
 }
 
 h2 {
@@ -542,6 +599,12 @@ body.dark {
     right: unset;
     bottom: 10px;
     transform: translateX(-50%);
+  }
+
+  .grid-collections {
+    .book {
+      margin-right: 0;
+    }
   }
 }
 </style>

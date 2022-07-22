@@ -17,3 +17,23 @@ export const getBooksList = (allBooks) => {
 
   return bookList;
 };
+
+export const getCollections = (books) => {
+  const collections = [];
+  const bookList = [];
+
+  books.forEach((book) => {
+    if (book.set && !collections.includes(book.set)) {
+      collections.push(book.set);
+    }
+  });
+
+  collections.forEach((collection) => {
+    bookList.push({
+      collection,
+      books: books.filter((book) => book.set === collection),
+    });
+  });
+
+  return bookList;
+};

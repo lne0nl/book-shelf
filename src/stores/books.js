@@ -10,6 +10,7 @@ export const useBookStore = defineStore("bookStore", {
     onlyComics: [],
     onlyBooks: [],
     listBooks: [],
+    listCollections: [],
     images: [],
     code: 0,
     numberOfBooks: 0,
@@ -50,6 +51,8 @@ export const useBookStore = defineStore("bookStore", {
         });
 
         this.listBooks = Utils.getBooksList(this.allBooks);
+        this.listCollections = Utils.getCollections(this.allBooks);
+        console.log(this.listCollections);
       } finally {
         this.loading = false;
       }
@@ -120,10 +123,26 @@ export const useBookStore = defineStore("bookStore", {
       });
     },
     async search(searchQuery) {
-      this.activeFilter = "all";
+      // @TODO: Finichs that with collections and list.
+      let searchMaterial = [];
+
+      switch (this.activeFilter) {
+        case "all":
+          searchMaterial = this.allBooks;
+          break;
+        case "comic":
+          searchMaterial = this.onlyComics;
+          break;
+        case "book":
+          searchMaterial = this.onlyBooks;
+          break;
+        case "collections":
+          searchMaterial = this.listCollections;
+          break;
+      }
 
       if (searchQuery.length > 0) {
-        const searcher = new JsonSearch.default(this.allBooks, {
+        const searcher = new JsonSearch.default(searchMaterial, {
           indice: {
             title: "title",
             author: "author",
@@ -134,7 +153,7 @@ export const useBookStore = defineStore("bookStore", {
         const foundBooks = searcher.query(`"${searchQuery}"`);
         this.books = foundBooks;
       } else {
-        this.books = this.allBooks;
+        this.books = searchMaterial;
       }
       this.numberOfBooks = this.books.length;
     },
@@ -154,9 +173,21 @@ export const useBookStore = defineStore("bookStore", {
     async filterBooks(filter) {
       if (filter !== this.activeFilter) {
         this.activeFilter = filter;
-        if (filter === "comic") this.books = this.onlyComics;
-        else if (filter === "book") this.books = this.onlyBooks;
-        else this.books = this.allBooks;
+
+        switch (filter) {
+          case "comic":
+            this.books = this.onlyComics;
+            break;
+          case "book":
+            this.books = this.onlyBooks;
+            break;
+          case "collections":
+            this.books = this.listCollections;
+            break;
+          default:
+            this.books = this.allBooks;
+            break;
+        }
 
         this.numberOfBooks = this.books.length;
       }

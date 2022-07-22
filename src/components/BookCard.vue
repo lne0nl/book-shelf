@@ -139,20 +139,21 @@ const openCollections = async (isbn) => {
       >
         {{ author }}
       </div>
-      <div>{{ set }}</div>
+      <div class="book-collection" v-if="set">{{ set }}</div>
+      <!-- <div class="book-collection">{{ set }}</div> -->
       <div v-if="borrower">Prêté à {{ borrower }}</div>
       <div class="book-type">
         <button
           :class="type === 'book' ? 'active' : ''"
           type="button"
-          @click="setType(isbn, 'book')"
+          @click.self="setType(isbn, 'book')"
         >
           Livre
         </button>
         <button
           :class="type === 'comic' ? 'active' : ''"
           type="button"
-          @click="setType(isbn, 'comic')"
+          @click.self="setType(isbn, 'comic')"
         >
           BD
         </button>
@@ -169,6 +170,7 @@ const openCollections = async (isbn) => {
   border-radius: 5px;
   width: 360px;
   background-color: rgb(226, 226, 226);
+  overflow: hidden;
 
   &-cover {
     display: flex;
@@ -207,6 +209,17 @@ const openCollections = async (isbn) => {
   &-author {
     margin-top: 10px;
     font-size: 16px;
+  }
+
+  &-collection {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    background-color: rgba($color: #000000, $alpha: 0.7);
+    width: 100%;
   }
 
   &-date {
@@ -291,16 +304,16 @@ const openCollections = async (isbn) => {
 
   &-type {
     position: absolute;
-    display: flex;
-    bottom: 10px;
+    bottom: 40px;
     right: 10px;
 
     button {
       border: none;
-      border-radius: 5px;
-      padding: 8px;
+      border-radius: 3px;
+      width: 45px;
       display: flex;
       align-items: center;
+      justify-content: center;
       cursor: pointer;
       transition: all 0.2s ease-in-out;
 
@@ -310,7 +323,7 @@ const openCollections = async (isbn) => {
       }
 
       &:first-child {
-        margin-right: 5px;
+        margin-bottom: 5px;
       }
     }
   }
